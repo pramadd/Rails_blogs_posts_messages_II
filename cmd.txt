@@ -1,0 +1,421 @@
+## Create 5 users
+
+User.create(first_name: "neethu", last_name: "reddy", email_address: "neethu@reddy.com")
+User.create(first_name: "chintu", last_name: "reddy", email_address: "chintu@reddy.com")
+User.create(first_name: "bunty", last_name: "reddy", email_address: "bunty@reddy.com")
+User.create(first_name: "pinky", last_name: "reddy", email_address: "pinky@reddy.com")
+User.create(first_name: "tinku", last_name: "reddy", email_address: "tinku@reddy.com")
+
+
+ User.all
+  User Load (2.1ms)  SELECT "users".* FROM "users"
++----+------------+-----------+------------------+-------------------------+-------------------------+
+| id | first_name | last_name | email_address    | created_at              | updated_at              |
++----+------------+-----------+------------------+-------------------------+-------------------------+
+| 1  | neethu     | reddy     | neethu@reddy.com | 2017-12-05 08:28:31 UTC | 2017-12-05 08:28:31 UTC |
+| 2  | chintu     | reddy     | chintu@reddy.com | 2017-12-05 08:28:59 UTC | 2017-12-05 08:28:59 UTC |
+| 3  | bunty      | reddy     | bunty@reddy.com  | 2017-12-05 08:30:10 UTC | 2017-12-05 08:30:10 UTC |
+| 4  | pinky      | reddy     | pinky@reddy.com  | 2017-12-05 08:30:36 UTC | 2017-12-05 08:30:36 UTC |
+| 5  | tinku      | reddy     | tinku@reddy.com  | 2017-12-05 08:30:55 UTC | 2017-12-05 08:30:55 UTC |
++----+------------+-----------+------------------+-------------------------+-------------------------+
+5 rows in set
+-------------------------------------------
+
+
+## Create 5 blogs
+
+
+1.upto(5) { |i| Blog.create(name: "Blog #{i}", description: "this is blog # #{i}")}
+
+Blog.all
+  Blog Load (7.8ms)  SELECT "blogs".* FROM "blogs"
++----+--------+------------------+-------------------------+-------------------------+
+| id | name   | description      | created_at              | updated_at              |
++----+--------+------------------+-------------------------+-------------------------+
+| 1  | Blog 1 | this is blog # 1 | 2017-12-05 08:34:22 UTC | 2017-12-05 08:34:22 UTC |
+| 2  | Blog 2 | this is blog # 2 | 2017-12-05 08:34:22 UTC | 2017-12-05 08:34:22 UTC |
+| 3  | Blog 3 | this is blog # 3 | 2017-12-05 08:34:22 UTC | 2017-12-05 08:34:22 UTC |
+| 4  | Blog 4 | this is blog # 4 | 2017-12-05 08:34:22 UTC | 2017-12-05 08:34:22 UTC |
+| 5  | Blog 5 | this is blog # 5 | 2017-12-05 08:34:22 UTC | 2017-12-05 08:34:22 UTC |
++----+--------+------------------+-------------------------+-------------------------+
+5 rows in set
+---------------------------------
+
+
+## Have the first 3 blogs be owned by the first user
+
+
+
+Owner.create(blog: Blog.first,user: User.first)
+
+(or)
+
+Owner.create(user: User.first,blog: Blog.first)
+----------
+Owner.create(user: User.first,blog: Blog.second)
+Owner.create(user: User.first,blog: Blog.third)
+
+
+
+Owner.all
+
+  Owner Load (2.4ms)  SELECT "owners".* FROM "owners"
++----+---------+---------+-------------------------+-------------------------+
+| id | user_id | blog_id | created_at              | updated_at              |
++----+---------+---------+-------------------------+-------------------------+
+| 1  | 1       | 1       | 2017-12-05 08:35:55 UTC | 2017-12-05 08:35:55 UTC |
+| 2  | 1       | 1       | 2017-12-05 08:36:26 UTC | 2017-12-05 08:36:26 UTC |
+| 3  | 1       | 2       | 2017-12-05 08:36:47 UTC | 2017-12-05 08:36:47 UTC |
+| 4  | 1       | 3       | 2017-12-05 08:37:10 UTC | 2017-12-05 08:37:10 UTC |
++----+---------+---------+-------------------------+-------------------------+
+4 rows in set
+-------------------
+Owner.delete(id=2)
+
+
+Owner.all
+  Owner Load (2.3ms)  SELECT "owners".* FROM "owners"
++----+---------+---------+-------------------------+-------------------------+
+| id | user_id | blog_id | created_at              | updated_at              |
++----+---------+---------+-------------------------+-------------------------+
+| 1  | 1       | 1       | 2017-12-05 08:35:55 UTC | 2017-12-05 08:35:55 UTC |
+| 3  | 1       | 2       | 2017-12-05 08:36:47 UTC | 2017-12-05 08:36:47 UTC |
+| 4  | 1       | 3       | 2017-12-05 08:37:10 UTC | 2017-12-05 08:37:10 UTC |
++----+---------+---------+-------------------------+-------------------------+
+3 rows in set
+----------------
+
+##Have the 5th blog you create be owned by the second user
+
+##Have the 6th blog you create be owned by the last user
+
+
+
+(~~~~~~~~~`HAD TO CREATE ANOTHER BLOG~~~~~~~~~~~~)
+Blog.create(name: "Blog 6", description: "this is blog # 6")
+   (0.1ms)  begin transaction
+  SQL (2.9ms)  INSERT INTO "blogs" ("name", "description", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["name", "Blog 6"], ["description", "this is blog # 6"], ["created_at", "2017-12-05 08:50:08.809055"], ["updated_at", "2017-12-05 08:50:08.809055"]]
+   (3.6ms)  commit transaction
++----+--------+------------------+-------------------------+-------------------------+
+| id | name   | description      | created_at              | updated_at              |
++----+--------+------------------+-------------------------+-------------------------+
+| 6  | Blog 6 | this is blog # 6 | 2017-12-05 08:50:08 UTC | 2017-12-05 08:50:08 UTC |
++----+--------+------------------+-------------------------+-------------------------+
+1 row in set
+2.3.1 :034 > Blog.all
+  Blog Load (2.0ms)  SELECT "blogs".* FROM "blogs"
++----+--------+------------------+-------------------------+-------------------------+
+| id | name   | description      | created_at              | updated_at              |
++----+--------+------------------+-------------------------+-------------------------+
+| 1  | Blog 1 | this is blog # 1 | 2017-12-05 08:34:22 UTC | 2017-12-05 08:34:22 UTC |
+| 2  | Blog 2 | this is blog # 2 | 2017-12-05 08:34:22 UTC | 2017-12-05 08:34:22 UTC |
+| 3  | Blog 3 | this is blog # 3 | 2017-12-05 08:34:22 UTC | 2017-12-05 08:34:22 UTC |
+| 4  | Blog 4 | this is blog # 4 | 2017-12-05 08:34:22 UTC | 2017-12-05 08:34:22 UTC |
+| 5  | Blog 5 | this is blog # 5 | 2017-12-05 08:34:22 UTC | 2017-12-05 08:34:22 UTC |
+| 6  | Blog 6 | this is blog # 6 | 2017-12-05 08:50:08 UTC | 2017-12-05 08:50:08 UTC |
++----+--------+------------------+-------------------------+-------------------------+
+6 rows in set
+(```````````````````````)
+
+Owner.create(user: User.last, blog: Blog.sixth)
+
+
+----------
+
+## Have the third user own all of the blogs that were created.
+
+Blog.all.each { |blog| Owner.create(user: User.third, blog: blog) }
++----+--------+------------------+-------------------------+-------------------------+
+| id | name   | description      | created_at              | updated_at              |
++----+--------+------------------+-------------------------+-------------------------+
+| 1  | Blog 1 | this is blog # 1 | 2017-12-05 08:34:22 UTC | 2017-12-05 08:34:22 UTC |
+| 2  | Blog 2 | this is blog # 2 | 2017-12-05 08:34:22 UTC | 2017-12-05 08:34:22 UTC |
+| 3  | Blog 3 | this is blog # 3 | 2017-12-05 08:34:22 UTC | 2017-12-05 08:34:22 UTC |
+| 4  | Blog 4 | this is blog # 4 | 2017-12-05 08:34:22 UTC | 2017-12-05 08:34:22 UTC |
+| 5  | Blog 5 | this is blog # 5 | 2017-12-05 08:34:22 UTC | 2017-12-05 08:34:22 UTC |
+| 6  | Blog 6 | this is blog # 6 | 2017-12-05 08:50:08 UTC | 2017-12-05 08:50:08 UTC |
++----+--------+------------------+-------------------------+-------------------------+
+6 rows in set
+-----------------------
+
+##  Have the first user create 3 posts for the blog with an id of 2. Remember that you shouldn't do Post.create(user: User.first, blog_id: 2) but more like Post.create(user: User.first, blog: Blog.find(2)). Again, you should never reference the foreign key in Rails.
+
+
+1.upto(3) { |i| Post.create(title: "Post ##{i}", content: "This is the content for post ##{i}", user: User.first, blog: Blog.find(2)) }
+
+Post.all
+  Post Load (1.9ms)  SELECT "posts".* FROM "posts"
++----+---------+---------------------------------+---------+---------+-------------------------+-------------------------+
+| id | title   | content                         | user_id | blog_id | created_at              | updated_at              |
++----+---------+---------------------------------+---------+---------+-------------------------+-------------------------+
+| 1  | Post #1 | This is the content for post #1 | 1       | 2       | 2017-12-05 09:04:44 UTC | 2017-12-05 09:04:44 UTC |
+| 2  | Post #2 | This is the content for post #2 | 1       | 2       | 2017-12-05 09:04:44 UTC | 2017-12-05 09:04:44 UTC |
+| 3  | Post #3 | This is the content for post #3 | 1       | 2       | 2017-12-05 09:04:44 UTC | 2017-12-05 09:04:44 UTC |
++----+---------+---------------------------------+---------+---------+-------------------------+-------------------------+
+3 rows in set
+------------
+
+
+
+##  Have the second user create 5 posts for the last Blog.
+
+last_id = Post.maximum(:id) + 1
+last_id.upto(last_id + 4) { |i| Post.create(title: "Post ##{i}", content: "This is the content for post ##{i}", user: User.second, blog: Blog.last) }
+
+
+ Post.all
+  Post Load (2.1ms)  SELECT "posts".* FROM "posts"
++----+---------+---------------------------------+---------+---------+-------------------------+-------------------------+
+| id | title   | content                         | user_id | blog_id | created_at              | updated_at              |
++----+---------+---------------------------------+---------+---------+-------------------------+-------------------------+
+| 1  | Post #1 | This is the content for post #1 | 1       | 2       | 2017-12-05 09:04:44 UTC | 2017-12-05 09:04:44 UTC |
+| 2  | Post #2 | This is the content for post #2 | 1       | 2       | 2017-12-05 09:04:44 UTC | 2017-12-05 09:04:44 UTC |
+| 3  | Post #3 | This is the content for post #3 | 1       | 2       | 2017-12-05 09:04:44 UTC | 2017-12-05 09:04:44 UTC |
+| 4  | Post #4 | This is the content for post #4 | 2       | 6       | 2017-12-05 09:15:14 UTC | 2017-12-05 09:15:14 UTC |
+| 5  | Post #5 | This is the content for post #5 | 2       | 6       | 2017-12-05 09:15:14 UTC | 2017-12-05 09:15:14 UTC |
+| 6  | Post #6 | This is the content for post #6 | 2       | 6       | 2017-12-05 09:15:14 UTC | 2017-12-05 09:15:14 UTC |
+| 7  | Post #7 | This is the content for post #7 | 2       | 6       | 2017-12-05 09:15:14 UTC | 2017-12-05 09:15:14 UTC |
+| 8  | Post #8 | This is the content for post #8 | 2       | 6       | 2017-12-05 09:15:14 UTC | 2017-12-05 09:15:14 UTC |
++----+---------+---------------------------------+---------+---------+-------------------------+-------------------------+
+8 rows in set
+---------
+
+## Have the 3rd user create several posts for different blogs.
+
+
+Post.create(title: "Post ##{Post.maximum(:id) + 1}", content: "This is the content for post ##{Post.maximum(:id) + 1}", user: User.third, blog: Blog.third)
+Post.create(title: "Post ##{Post.maximum(:id) + 1}", content: "This is the content for post ##{Post.maximum(:id) + 1}", user: User.third, blog: Blog.fourth)
+Post.create(title: "Post ##{Post.maximum(:id) + 1}", content: "This is the content for post ##{Post.maximum(:id) + 1}", user: User.third, blog: Blog.fifth)
+
+
+
+
+Post.all
+  Post Load (2.0ms)  SELECT "posts".* FROM "posts"
++----+----------+----------------------------------+---------+---------+-------------------------+-------------------------+
+| id | title    | content                          | user_id | blog_id | created_at              | updated_at              |
++----+----------+----------------------------------+---------+---------+-------------------------+-------------------------+
+| 1  | Post #1  | This is the content for post #1  | 1       | 2       | 2017-12-05 09:04:44 UTC | 2017-12-05 09:04:44 UTC |
+| 2  | Post #2  | This is the content for post #2  | 1       | 2       | 2017-12-05 09:04:44 UTC | 2017-12-05 09:04:44 UTC |
+| 3  | Post #3  | This is the content for post #3  | 1       | 2       | 2017-12-05 09:04:44 UTC | 2017-12-05 09:04:44 UTC |
+| 4  | Post #4  | This is the content for post #4  | 2       | 6       | 2017-12-05 09:15:14 UTC | 2017-12-05 09:15:14 UTC |
+| 5  | Post #5  | This is the content for post #5  | 2       | 6       | 2017-12-05 09:15:14 UTC | 2017-12-05 09:15:14 UTC |
+| 6  | Post #6  | This is the content for post #6  | 2       | 6       | 2017-12-05 09:15:14 UTC | 2017-12-05 09:15:14 UTC |
+| 7  | Post #7  | This is the content for post #7  | 2       | 6       | 2017-12-05 09:15:14 UTC | 2017-12-05 09:15:14 UTC |
+| 8  | Post #8  | This is the content for post #8  | 2       | 6       | 2017-12-05 09:15:14 UTC | 2017-12-05 09:15:14 UTC |
+| 9  | Post #9  | This is the content for post #9  | 3       | 3       | 2017-12-05 09:16:54 UTC | 2017-12-05 09:16:54 UTC |
+| 10 | Post #10 | This is the content for post #10 | 3       | 4       | 2017-12-05 09:17:15 UTC | 2017-12-05 09:17:15 UTC |
+| 11 | Post #11 | This is the content for post #11 | 3       | 5       | 2017-12-05 09:17:23 UTC | 2017-12-05 09:17:23 UTC |
++----+----------+----------------------------------+---------+---------+-------------------------+-------------------------+
+11 rows in set
+------------------
+
+
+## Have the 3rd user create 2 messages for the first post created and 3 messages for the second post created
+
+Message.create(author: "Apple Inc", message: "My products are the best", user: User.third, post: Post.first)
+Message.create(author: "Microsoft", message: "No way!", user: User.third, post: Post.first)
+Message.create(author: "NBA", message: "Basketball is the best sport", user: User.third, post: Post.second)
+Message.create(author: "FIFA", message: "We have the world cup. We are the best", user: User.third, post: Post.second)
+Message.create(author: "NFL", message: "We are the real football", user: User.third, post: Post.second)
+
+
+Message.all
+  Message Load (2.0ms)  SELECT "messages".* FROM "messages"
++----+-----------+--------------------------------------+---------+---------+-------------------------+-------------------------+
+| id | author    | message                              | user_id | post_id | created_at              | updated_at              |
++----+-----------+--------------------------------------+---------+---------+-------------------------+-------------------------+
+| 1  | Apple Inc | My products are the best             | 3       | 1       | 2017-12-05 09:20:16 UTC | 2017-12-05 09:20:16 UTC |
+| 2  | Microsoft | No way!                              | 3       | 1       | 2017-12-05 09:20:30 UTC | 2017-12-05 09:20:30 UTC |
+| 3  | NBA       | Basketball is the best sport         | 3       | 2       | 2017-12-05 09:20:36 UTC | 2017-12-05 09:20:36 UTC |
+| 4  | FIFA      | We have the world cup. We are the... | 3       | 2       | 2017-12-05 09:20:45 UTC | 2017-12-05 09:20:45 UTC |
+| 5  | NFL       | We are the real football             | 3       | 2       | 2017-12-05 09:20:58 UTC | 2017-12-05 09:20:58 UTC |
++----+-----------+--------------------------------------+---------+---------+-------------------------+-------------------------+
+5 rows in set
+----------------------
+
+
+## Have the 4th user create 3 messages for the last post you created.
+
+Message.create(author: "Some Author", message: "My book is the best", user: User.fourth, post: Post.last)
+Message.create(author: "Another Author", message: "Your book is really good indeed", user: User.fourth, post: Post.last)
+Message.create(author: "Some Other Author", message: "Agree!", user: User.fourth, post: Post.last)
+
+
+Message.all
+  Message Load (2.1ms)  SELECT "messages".* FROM "messages"
++----+-------------------+---------------------------+---------+---------+-------------------------+-------------------------+
+| id | author            | message                   | user_id | post_id | created_at              | updated_at              |
++----+-------------------+---------------------------+---------+---------+-------------------------+-------------------------+
+| 1  | Apple Inc         | My products are the best  | 3       | 1       | 2017-12-05 09:20:16 UTC | 2017-12-05 09:20:16 UTC |
+| 2  | Microsoft         | No way!                   | 3       | 1       | 2017-12-05 09:20:30 UTC | 2017-12-05 09:20:30 UTC |
+| 3  | NBA               | Basketball is the best... | 3       | 2       | 2017-12-05 09:20:36 UTC | 2017-12-05 09:20:36 UTC |
+| 4  | FIFA              | We have the world cup.... | 3       | 2       | 2017-12-05 09:20:45 UTC | 2017-12-05 09:20:45 UTC |
+| 5  | NFL               | We are the real football  | 3       | 2       | 2017-12-05 09:20:58 UTC | 2017-12-05 09:20:58 UTC |
+| 6  | Some Author       | My book is the best       | 4       | 11      | 2017-12-05 09:22:47 UTC | 2017-12-05 09:22:47 UTC |
+| 7  | Another Author    | Your book is really go... | 4       | 11      | 2017-12-05 09:22:58 UTC | 2017-12-05 09:22:58 UTC |
+| 8  | Some Other Author | Agree!                    | 4       | 11      | 2017-12-05 09:23:07 UTC | 2017-12-05 09:23:07 UTC |
++----+-------------------+---------------------------+---------+---------+-------------------------+-------------------------+
+8 rows in set
+
+-0-------------------------------
+
+## Change the owner of the 2nd post to the last user.
+
+
+
+Post.second.update(user: User.last)
+
+Post.all
+  Post Load (2.8ms)  SELECT "posts".* FROM "posts"
++----+----------+----------------------------------+---------+---------+-------------------------+-------------------------+
+| id | title    | content                          | user_id | blog_id | created_at              | updated_at              |
++----+----------+----------------------------------+---------+---------+-------------------------+-------------------------+
+| 1  | Post #1  | This is the content for post #1  | 1       | 2       | 2017-12-05 09:04:44 UTC | 2017-12-05 09:04:44 UTC |
+| 2  | Post #2  | This is the content for post #2  | 5       | 2       | 2017-12-05 09:04:44 UTC | 2017-12-05 09:24:09 UTC |
+| 3  | Post #3  | This is the content for post #3  | 1       | 2       | 2017-12-05 09:04:44 UTC | 2017-12-05 09:04:44 UTC |
+| 4  | Post #4  | This is the content for post #4  | 2       | 6       | 2017-12-05 09:15:14 UTC | 2017-12-05 09:15:14 UTC |
+| 5  | Post #5  | This is the content for post #5  | 2       | 6       | 2017-12-05 09:15:14 UTC | 2017-12-05 09:15:14 UTC |
+| 6  | Post #6  | This is the content for post #6  | 2       | 6       | 2017-12-05 09:15:14 UTC | 2017-12-05 09:15:14 UTC |
+| 7  | Post #7  | This is the content for post #7  | 2       | 6       | 2017-12-05 09:15:14 UTC | 2017-12-05 09:15:14 UTC |
+| 8  | Post #8  | This is the content for post #8  | 2       | 6       | 2017-12-05 09:15:14 UTC | 2017-12-05 09:15:14 UTC |
+| 9  | Post #9  | This is the content for post #9  | 3       | 3       | 2017-12-05 09:16:54 UTC | 2017-12-05 09:16:54 UTC |
+| 10 | Post #10 | This is the content for post #10 | 3       | 4       | 2017-12-05 09:17:15 UTC | 2017-12-05 09:17:15 UTC |
+| 11 | Post #11 | This is the content for post #11 | 3       | 5       | 2017-12-05 09:17:23 UTC | 2017-12-05 09:17:23 UTC |
++----+----------+----------------------------------+---------+---------+-------------------------+-------------------------+
+11 rows in set
+----------------------
+
+Change the 2nd post's content to be something else.
+
+Post.second.update(content: "Changing content to something else")
+
+Post.all
+  Post Load (2.1ms)  SELECT "posts".* FROM "posts"
++----+----------+------------------------------------+---------+---------+-------------------------+-------------------------+
+| id | title    | content                            | user_id | blog_id | created_at              | updated_at              |
++----+----------+------------------------------------+---------+---------+-------------------------+-------------------------+
+| 1  | Post #1  | This is the content for post #1    | 1       | 2       | 2017-12-05 09:04:44 UTC | 2017-12-05 09:04:44 UTC |
+| 2  | Post #2  | Changing content to something else | 5       | 2       | 2017-12-05 09:04:44 UTC | 2017-12-05 09:26:04 UTC |
+| 3  | Post #3  | This is the content for post #3    | 1       | 2       | 2017-12-05 09:04:44 UTC | 2017-12-05 09:04:44 UTC |
+| 4  | Post #4  | This is the content for post #4    | 2       | 6       | 2017-12-05 09:15:14 UTC | 2017-12-05 09:15:14 UTC |
+| 5  | Post #5  | This is the content for post #5    | 2       | 6       | 2017-12-05 09:15:14 UTC | 2017-12-05 09:15:14 UTC |
+| 6  | Post #6  | This is the content for post #6    | 2       | 6       | 2017-12-05 09:15:14 UTC | 2017-12-05 09:15:14 UTC |
+| 7  | Post #7  | This is the content for post #7    | 2       | 6       | 2017-12-05 09:15:14 UTC | 2017-12-05 09:15:14 UTC |
+| 8  | Post #8  | This is the content for post #8    | 2       | 6       | 2017-12-05 09:15:14 UTC | 2017-12-05 09:15:14 UTC |
+| 9  | Post #9  | This is the content for post #9    | 3       | 3       | 2017-12-05 09:16:54 UTC | 2017-12-05 09:16:54 UTC |
+| 10 | Post #10 | This is the content for post #10   | 3       | 4       | 2017-12-05 09:17:15 UTC | 2017-12-05 09:17:15 UTC |
+| 11 | Post #11 | This is the content for post #11   | 3       | 5       | 2017-12-05 09:17:23 UTC | 2017-12-05 09:17:23 UTC |
++----+----------+------------------------------------+---------+---------+-------------------------+-------------------------+
+11 rows in set
+--------
+
+
+## Retrieve all blogs owned by the 3rd user (make this work by simply doing: User.find(3).blogs).
+
+User.third.blogs
+
+
+(or)
+
+User.find(3).blogs
+--------
+
+
+##  Retrieve all posts that were created by the 3rd user
+
+User.third.posts
+
+
+
+  User Load (2.0ms)  SELECT  "users".* FROM "users"  ORDER BY "users"."id" ASC LIMIT 1 OFFSET 2
+  Post Load (1.8ms)  SELECT "posts".* FROM "posts" WHERE "posts"."user_id" = ?  [["user_id", 3]]
++----+----------+----------------------------------+---------+---------+-------------------------+-------------------------+
+| id | title    | content                          | user_id | blog_id | created_at              | updated_at              |
++----+----------+----------------------------------+---------+---------+-------------------------+-------------------------+
+| 9  | Post #9  | This is the content for post #9  | 3       | 3       | 2017-12-05 09:16:54 UTC | 2017-12-05 09:16:54 UTC |
+| 10 | Post #10 | This is the content for post #10 | 3       | 4       | 2017-12-05 09:17:15 UTC | 2017-12-05 09:17:15 UTC |
+| 11 | Post #11 | This is the content for post #11 | 3       | 5       | 2017-12-05 09:17:23 UTC | 2017-12-05 09:17:23 UTC |
++----+----------+----------------------------------+---------+---------+-------------------------+-------------------------+
+3 rows in set
+-------------------
+
+
+## Retrieve all messages left by the 3rd user
+
+User.third.messages
+
+
++----+-----------+--------------------------------------+---------+---------+-------------------------+-------------------------+
+| id | author    | message                              | user_id | post_id | created_at              | updated_at              |
++----+-----------+--------------------------------------+---------+---------+-------------------------+-------------------------+
+| 1  | Apple Inc | My products are the best             | 3       | 1       | 2017-12-05 09:20:16 UTC | 2017-12-05 09:20:16 UTC |
+| 2  | Microsoft | No way!                              | 3       | 1       | 2017-12-05 09:20:30 UTC | 2017-12-05 09:20:30 UTC |
+| 3  | NBA       | Basketball is the best sport         | 3       | 2       | 2017-12-05 09:20:36 UTC | 2017-12-05 09:20:36 UTC |
+| 4  | FIFA      | We have the world cup. We are the... | 3       | 2       | 2017-12-05 09:20:45 UTC | 2017-12-05 09:20:45 UTC |
+| 5  | NFL       | We are the real football             | 3       | 2       | 2017-12-05 09:20:58 UTC | 2017-12-05 09:20:58 UTC |
++----+-----------+--------------------------------------+---------+---------+-------------------------+-------------------------+
+5 rows in set
+
+=--------------
+
+## Retrieve all posts associated with the blog id 5 as well as who left these posts.   
+
+
+Post.joins(:user, :blog).where("blogs.id = ?", 5).select("*")
+
++----+----------+----------+---------+---------+----------+------------+-----------+-----------+-----------+--------+-----------+
+| id | title    | content  | user_id | blog_id | creat... | updated_at | first_... | last_name | email_... | name   | descri... |
++----+----------+----------+---------+---------+----------+------------+-----------+-----------+-----------+--------+-----------+
+| 5  | Post #11 | This ... | 3       | 5       | 2017-... | 2017-12... | bunty     | reddy     | bunty@... | Blog 5 | this i... |
++----+----------+----------+---------+---------+----------+------------+-----------+-----------+-----------+--------+-----------+
+1 row in set
+--------------------------
+
+## Retrieve all messages associated with the blog id 5 along with all the user information of those who left the messages
+
+
+Message.joins(:user).where(post: Blog.find(5).posts).select("*")
+
+
+
+  Blog Load (1.3ms)  SELECT  "blogs".* FROM "blogs" WHERE "blogs"."id" = ? LIMIT 1  [["id", 5]]
+  Message Load (1.1ms)  SELECT * FROM "messages" INNER JOIN "users" ON "users"."id" = "messages"."user_id" WHERE "messages"."post_id" IN (SELECT "posts"."id" FROM "posts" WHERE "posts"."blog_id" = ?)  [["blog_id", 5]]
++----+--------------+---------------+---------+---------+--------------+---------------+------------+-----------+---------------+
+| id | author       | message       | user_id | post_id | created_at   | updated_at    | first_name | last_name | email_address |
++----+--------------+---------------+---------+---------+--------------+---------------+------------+-----------+---------------+
+| 4  | Some Author  | My book is... | 4       | 11      | 2017-12-0... | 2017-12-05... | pinky      | reddy     | pinky@redd... |
+| 4  | Another A... | Your book ... | 4       | 11      | 2017-12-0... | 2017-12-05... | pinky      | reddy     | pinky@redd... |
+| 4  | Some Othe... | Agree!        | 4       | 11      | 2017-12-0... | 2017-12-05... | pinky      | reddy     | pinky@redd... |
++----+--------------+---------------+---------+---------+--------------+---------------+------------+-----------+---------------+
+3 rows in set
+--------------
+
+## Grab all user information of those that own the first blog (make this work by allowing Blog.first.owners to work).
+
+
+Blog.first.users
+
++----+------------+-----------+------------------+-------------------------+-------------------------+
+| id | first_name | last_name | email_address    | created_at              | updated_at              |
++----+------------+-----------+------------------+-------------------------+-------------------------+
+| 1  | neethu     | reddy     | neethu@reddy.com | 2017-12-05 08:28:31 UTC | 2017-12-05 08:28:31 UTC |
+| 3  | bunty      | reddy     | bunty@reddy.com  | 2017-12-05 08:30:10 UTC | 2017-12-05 08:30:10 UTC |
++----+------------+-----------+------------------+-------------------------+-------------------------+
+2 rows in set
+
+---------------
+
+## Change it so that the first blog is no longer owned by the first user.
+
+Owner.where("id = ? AND user_id = ?", 1, 1,).update_all("user_id = 5")
+
+
++----+---------+---------+-------------------------+-------------------------+
+| id | user_id | blog_id | created_at              | updated_at              |
++----+---------+---------+-------------------------+-------------------------+
+| 1  | 5       | 1       | 2017-12-05 08:35:55 UTC | 2017-12-05 08:35:55 UTC |
++----+---------+---------+
+
+--------------------
+
