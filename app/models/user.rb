@@ -4,7 +4,11 @@ class User < ActiveRecord::Base
     has_many :messages
     has_many :posts
 
-    
+   
+    has_many :comments, as: :commentable #added the comments relationship
+
+
+
     has_many :blogs, through: :owners # all the blogs owned by a specific user
 
     has_many :blog_posts, through: :posts, source: :blog # all the blogs a user has posted on

@@ -1,0 +1,290 @@
+
+# creating a polymorphic model
+rails g model Comment content:text commentable:references{polymorphic}
+
+# model structures
+class Comment < ActiveRecord::Base
+  belongs_to :commentable, polymorphic: true
+
+  validates :content, presence: true
+end
+
+class User < ActiveRecord::Base
+  EMAIL_REGEX = /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]+)\z/i
+  has_many :owners
+  has_many :messages
+  has_many :posts
+
+  # added the comments relationship
+  has_many :comments, as: :commentable
+
+
+  # all the blogs owned by a specific user
+  has_many :blogs, through: :owners
+
+  # all the blogs a user has posted on
+  has_many :blog_posts, through: :posts, source: :blog
+
+  validates :email, uniqueness: { case_sensitive: false }, format: { with: EMAIL_REGEX }
+  validates :first_name, :last_name, :email, presence: true
+end
+
+class Blog < ActiveRecord::Base
+  has_many :owners
+  has_many :posts
+  has_many :comments, as: :commentable
+
+  # added the comments relationship
+  has_many :comments, as: :commentable
+
+  # all the users that own a specifc blog
+  has_many :users, through: :owners
+
+  # all the users that posted on a specific blog
+  has_many :user_posts, through: :posts, source: :user
+
+  validates :name, :description, presence: true
+end
+
+class Post < ActiveRecord::Base
+  has_many :messages
+  belongs_to :blog
+  belongs_to :user
+
+  # added the comments relationship
+  has_many :comments, as: :commentable
+
+  validates :content, :title, presence: true
+end
+
+class Message < ActiveRecord::Base
+  belongs_to :post
+  belongs_to :user
+
+  # added the comments relationship
+  has_many :comments, as: :commentable
+
+  validates :author, :message, presence: true
+end
+------------------------------------------------------
+
+
+
+
+2.3.1 :003 > User.all
+  User Load (2.1ms)  SELECT "users".* FROM "users"
++----+------------+-----------+------------------+-------------------------+-------------------------+
+| id | first_name | last_name | email_address    | created_at              | updated_at              |
++----+------------+-----------+------------------+-------------------------+-------------------------+
+| 1  | neethu     | reddy     | neethu@reddy.com | 2017-12-05 08:28:31 UTC | 2017-12-05 08:28:31 UTC |
+| 2  | chintu     | reddy     | chintu@reddy.com | 2017-12-05 08:28:59 UTC | 2017-12-05 08:28:59 UTC |
+| 3  | bunty      | reddy     | bunty@reddy.com  | 2017-12-05 08:30:10 UTC | 2017-12-05 08:30:10 UTC |
+| 4  | pinky      | reddy     | pinky@reddy.com  | 2017-12-05 08:30:36 UTC | 2017-12-05 08:30:36 UTC |
+| 5  | tinku      | reddy     | tinku@reddy.com  | 2017-12-05 08:30:55 UTC | 2017-12-05 08:30:55 UTC |
++----+------------+-----------+------------------+-------------------------+-------------------------+
+5 rows in set
+2.3.1 :004 > Blog.all
+  Blog Load (1.4ms)  SELECT "blogs".* FROM "blogs"
++----+--------+------------------+-------------------------+-------------------------+
+| id | name   | description      | created_at              | updated_at              |
++----+--------+------------------+-------------------------+-------------------------+
+| 1  | Blog 1 | this is blog # 1 | 2017-12-05 08:34:22 UTC | 2017-12-05 08:34:22 UTC |
+| 2  | Blog 2 | this is blog # 2 | 2017-12-05 08:34:22 UTC | 2017-12-05 08:34:22 UTC |
+| 3  | Blog 3 | this is blog # 3 | 2017-12-05 08:34:22 UTC | 2017-12-05 08:34:22 UTC |
+| 4  | Blog 4 | this is blog # 4 | 2017-12-05 08:34:22 UTC | 2017-12-05 08:34:22 UTC |
+| 5  | Blog 5 | this is blog # 5 | 2017-12-05 08:34:22 UTC | 2017-12-05 08:34:22 UTC |
+| 6  | Blog 6 | this is blog # 6 | 2017-12-05 08:50:08 UTC | 2017-12-05 08:50:08 UTC |
++----+--------+------------------+-------------------------+-------------------------+
+6 rows in set
+2.3.1 :005 > Message.all
+  Message Load (6.8ms)  SELECT "messages".* FROM "messages"
++----+-------------------+---------------------------+---------+---------+-------------------------+-------------------------+
+| id | author            | message                   | user_id | post_id | created_at              | updated_at              |
++----+-------------------+---------------------------+---------+---------+-------------------------+-------------------------+
+| 1  | Apple Inc         | My products are the best  | 3       | 1       | 2017-12-05 09:20:16 UTC | 2017-12-05 09:20:16 UTC |
+| 2  | Microsoft         | No way!                   | 3       | 1       | 2017-12-05 09:20:30 UTC | 2017-12-05 09:20:30 UTC |
+| 3  | NBA               | Basketball is the best... | 3       | 2       | 2017-12-05 09:20:36 UTC | 2017-12-05 09:20:36 UTC |
+| 4  | FIFA              | We have the world cup.... | 3       | 2       | 2017-12-05 09:20:45 UTC | 2017-12-05 09:20:45 UTC |
+| 5  | NFL               | We are the real football  | 3       | 2       | 2017-12-05 09:20:58 UTC | 2017-12-05 09:20:58 UTC |
+| 6  | Some Author       | My book is the best       | 4       | 11      | 2017-12-05 09:22:47 UTC | 2017-12-05 09:22:47 UTC |
+| 7  | Another Author    | Your book is really go... | 4       | 11      | 2017-12-05 09:22:58 UTC | 2017-12-05 09:22:58 UTC |
+| 8  | Some Other Author | Agree!                    | 4       | 11      | 2017-12-05 09:23:07 UTC | 2017-12-05 09:23:07 UTC |
++----+-------------------+---------------------------+---------+---------+-------------------------+-------------------------+
+8 rows in set
+2.3.1 :006 > Post.all
+  Post Load (1.6ms)  SELECT "posts".* FROM "posts"
++----+----------+------------------------------------+---------+---------+-------------------------+-------------------------+
+| id | title    | content                            | user_id | blog_id | created_at              | updated_at              |
++----+----------+------------------------------------+---------+---------+-------------------------+-------------------------+
+| 1  | Post #1  | This is the content for post #1    | 1       | 2       | 2017-12-05 09:04:44 UTC | 2017-12-05 09:04:44 UTC |
+| 2  | Post #2  | Changing content to something else | 5       | 2       | 2017-12-05 09:04:44 UTC | 2017-12-05 09:26:04 UTC |
+| 3  | Post #3  | This is the content for post #3    | 1       | 2       | 2017-12-05 09:04:44 UTC | 2017-12-05 09:04:44 UTC |
+| 4  | Post #4  | This is the content for post #4    | 2       | 6       | 2017-12-05 09:15:14 UTC | 2017-12-05 09:15:14 UTC |
+| 5  | Post #5  | This is the content for post #5    | 2       | 6       | 2017-12-05 09:15:14 UTC | 2017-12-05 09:15:14 UTC |
+| 6  | Post #6  | This is the content for post #6    | 2       | 6       | 2017-12-05 09:15:14 UTC | 2017-12-05 09:15:14 UTC |
+| 7  | Post #7  | This is the content for post #7    | 2       | 6       | 2017-12-05 09:15:14 UTC | 2017-12-05 09:15:14 UTC |
+| 8  | Post #8  | This is the content for post #8    | 2       | 6       | 2017-12-05 09:15:14 UTC | 2017-12-05 09:15:14 UTC |
+| 9  | Post #9  | This is the content for post #9    | 3       | 3       | 2017-12-05 09:16:54 UTC | 2017-12-05 09:16:54 UTC |
+| 10 | Post #10 | This is the content for post #10   | 3       | 4       | 2017-12-05 09:17:15 UTC | 2017-12-05 09:17:15 UTC |
+| 11 | Post #11 | This is the content for post #11   | 3       | 5       | 2017-12-05 09:17:23 UTC | 2017-12-05 09:17:23 UTC |
++----+----------+------------------------------------+---------+---------+-------------------------+-------------------------+
+11 rows in set
+------~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~$$$$$$$$$$$$$$$$$$$$$$~~~~~~~~``
+----------------------
+$$$$$$$$$$$$$$$$$$$$$$$$
+
+# add comments for user, blog, post and message
+
+#USERS-COMMENTS
+
+Comment.create(content: "This is a comment from user1", commentable: User.first)
+Comment.create(content: "This is a comment from user2", commentable: User.second)
+Comment.create(content: "Another comment from user2", commentable: User.second)
+
+Comment.all
+  Comment Load (2.6ms)  SELECT "comments".* FROM "comments"
++----+------------------------------+----------------+------------------+-------------------------+-------------------------+
+| id | content                      | commentable_id | commentable_type | created_at              | updated_at              |
++----+------------------------------+----------------+------------------+-------------------------+-------------------------+
+| 1  | This is a comment from user1 | 1              | User             | 2017-12-05 20:09:22 UTC | 2017-12-05 20:09:22 UTC |
+| 2  | This is a comment from user2 | 2              | User             | 2017-12-05 20:09:41 UTC | 2017-12-05 20:09:41 UTC |
+| 3  | Another comment from user2   | 2              | User             | 2017-12-05 20:09:55 UTC | 2017-12-05 20:09:55 UTC |
++----+------------------------------+----------------+------------------+-------------------------+-------------------------+
+3 rows in set
+
+
+
+
+
+User.second.comments
+  User Load (2.2ms)  SELECT  "users".* FROM "users"  ORDER BY "users"."id" ASC LIMIT 1 OFFSET 1
+  Comment Load (1.2ms)  SELECT "comments".* FROM "comments" WHERE "comments"."commentable_id" = ? AND "comments"."commentable_type" = ?  [["commentable_id", 2], ["commentable_type", "User"]]
++----+------------------------------+----------------+------------------+-------------------------+-------------------------+
+| id | content                      | commentable_id | commentable_type | created_at              | updated_at              |
++----+------------------------------+----------------+------------------+-------------------------+-------------------------+
+| 2  | This is a comment from user2 | 2              | User             | 2017-12-05 20:09:41 UTC | 2017-12-05 20:09:41 UTC |
+| 3  | Another comment from user2   | 2              | User             | 2017-12-05 20:09:55 UTC | 2017-12-05 20:09:55 UTC |
++----+------------------------------+----------------+------------------+-------------------------+-------------------------+
+2 rows in set
+
+
+--------------------
+----------------------
+$$$$$$$$$$$$$$$$$$$$$$$$
+
+
+#BLOGS-COMMENTS
+
+Comment.create(content: "This is a comment on the first blog", commentable: Blog.first)
+
+Comment.create(content: "adding  comment on the first blog", commentable: Blog.first)
+Comment.create(content: "adding  comment on the blog2", commentable: Blog.second)
+
+
+
+Comment.all
+  Comment Load (2.1ms)  SELECT "comments".* FROM "comments"
++----+----------------------------------+----------------+------------------+-------------------------+-------------------------+
+| id | content                          | commentable_id | commentable_type | created_at              | updated_at              |
++----+----------------------------------+----------------+------------------+-------------------------+-------------------------+
+| 1  | This is a comment from user1     | 1              | User             | 2017-12-05 20:09:22 UTC | 2017-12-05 20:09:22 UTC |
+| 2  | This is a comment from user2     | 2              | User             | 2017-12-05 20:09:41 UTC | 2017-12-05 20:09:41 UTC |
+| 3  | Another comment from user2       | 2              | User             | 2017-12-05 20:09:55 UTC | 2017-12-05 20:09:55 UTC |
+| 4  | This is a comment on the firs... | 1              | Blog             | 2017-12-05 20:12:52 UTC | 2017-12-05 20:12:52 UTC |
+| 5  | adding  comment on the first ... | 1              | Blog             | 2017-12-05 20:13:10 UTC | 2017-12-05 20:13:10 UTC |
+| 6  | adding  comment on the blog2     | 2              | Blog             | 2017-12-05 20:13:30 UTC | 2017-12-05 20:13:30 UTC |
++----+----------------------------------+----------------+------------------+-------------------------+-------------------------+
+6 rows in set
+
+
+
+Blog.first.comments
+  Blog Load (2.0ms)  SELECT  "blogs".* FROM "blogs"  ORDER BY "blogs"."id" ASC LIMIT 1
+  Comment Load (1.2ms)  SELECT "comments".* FROM "comments" WHERE "comments"."commentable_id" = ? AND "comments"."commentable_type" = ?  [["commentable_id", 1], ["commentable_type", "Blog"]]
++----+----------------------------------+----------------+------------------+-------------------------+-------------------------+
+| id | content                          | commentable_id | commentable_type | created_at              | updated_at              |
++----+----------------------------------+----------------+------------------+-------------------------+-------------------------+
+| 4  | This is a comment on the firs... | 1              | Blog             | 2017-12-05 20:12:52 UTC | 2017-12-05 20:12:52 UTC |
+| 5  | adding  comment on the first ... | 1              | Blog             | 2017-12-05 20:13:10 UTC | 2017-12-05 20:13:10 UTC |
++----+----------------------------------+----------------+------------------+-------------------------+-------------------------+
+2 rows in set
+----------------------
+$$$$$$$$$$$$$$$$$$$$$$$$
+~~~~~
+
+# Posts-COMMENTS
+
+
+ Comment.create(content: "adding  comment on the Post2", commentable: Post.second)
+
+ Comment.create(content: "adding  comment on the Post9", commentable: Post.find(9))
+
+
+Comment.create(content: "adding  comment on the Post9", commentable: Post.find(10))
+
+Comment.create(content: "adding second comment on the Post9", commentable: Post.find(9))
+
+ Post.find(9).comments
+  Post Load (4.7ms)  SELECT  "posts".* FROM "posts" WHERE "posts"."id" = ? LIMIT 1  [["id", 9]]
+  Comment Load (1.7ms)  SELECT "comments".* FROM "comments" WHERE "comments"."commentable_id" = ? AND "comments"."commentable_type" = ?  [["commentable_id", 9], ["commentable_type", "Post"]]
++----+----------------------------------+----------------+------------------+-------------------------+-------------------------+
+| id | content                          | commentable_id | commentable_type | created_at              | updated_at              |
++----+----------------------------------+----------------+------------------+-------------------------+-------------------------+
+| 8  | adding  comment on the Post9     | 9              | Post             | 2017-12-05 20:17:05 UTC | 2017-12-05 20:17:05 UTC |
+| 10 | adding second comment on the ... | 9              | Post             | 2017-12-05 20:18:01 UTC | 2017-12-05 20:18:01 UTC |
++----+----------------------------------+----------------+------------------+-------------------------+-------------------------+
+2 rows in set
+
+-------------------------
+----------------------
+$$$$$$$$$$$$$$$$$$$$$$$$
+~~~~~
+
+
+#MESSAGE-COMMENTS
+
+
+Comment.create(content: "adding  comment on the Post8", commentable: Message.find(8))
+
+Comment.create(content: "adding another  comment on the Post8", commentable: Message.find(8))
+ Comment.create(content: "adding another  comment on the Post5", commentable: Message.fifth)
+
+Comment.create(content: "adding another  comment on the Post6", commentable: Message.find(6))
+
+
+
+
+Message.find(8).comments
+  Message Load (1.8ms)  SELECT  "messages".* FROM "messages" WHERE "messages"."id" = ? LIMIT 1  [["id", 8]]
+  Comment Load (1.2ms)  SELECT "comments".* FROM "comments" WHERE "comments"."commentable_id" = ? AND "comments"."commentable_type" = ?  [["commentable_id", 8], ["commentable_type", "Message"]]
++----+----------------------------------+----------------+------------------+-------------------------+-------------------------+
+| id | content                          | commentable_id | commentable_type | created_at              | updated_at              |
++----+----------------------------------+----------------+------------------+-------------------------+-------------------------+
+| 11 | adding  comment on the Post8     | 8              | Message          | 2017-12-05 20:20:06 UTC | 2017-12-05 20:20:06 UTC |
+| 12 | adding another  comment on th... | 8              | Message          | 2017-12-05 20:20:17 UTC | 2017-12-05 20:20:17 UTC |
++----+----------------------------------+----------------+------------------+-------------------------+-------------------------+
+2 rows in set
+
+
+Message.fifth.comments
+  Message Load (2.2ms)  SELECT  "messages".* FROM "messages"  ORDER BY "messages"."id" ASC LIMIT 1 OFFSET 4
+  Comment Load (1.7ms)  SELECT "comments".* FROM "comments" WHERE "comments"."commentable_id" = ? AND "comments"."commentable_type" = ?  [["commentable_id", 5], ["commentable_type", "Message"]]
++----+----------------------------------+----------------+------------------+-------------------------+-------------------------+
+| id | content                          | commentable_id | commentable_type | created_at              | updated_at              |
++----+----------------------------------+----------------+------------------+-------------------------+-------------------------+
+| 13 | adding another  comment on th... | 5              | Message          | 2017-12-05 20:20:30 UTC | 2017-12-05 20:20:30 UTC |
++----+----------------------------------+----------------+------------------+-------------------------+-------------------------+
+1 row in set
+
+
+
+
+------------------------------------------------------
+#updating
+
+Comment.where("id = ? AND commentable_id = ?",2,2).update_all("commentable_id=1")
+-----
+#deleting
+Comment.first.destroy
+---reading
+Comment.all
